@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="he">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>עץ הרגשות</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f9ff;
+            direction: rtl;
+            text-align: right;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .emotions-tree {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+        
+        .emotion {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            margin: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            text-align: center;
+            transition: transform 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .emotion.main {
+            width: 140px;
+            height: 140px;
+        }
+        
+        .emotion.secondary {
+            width: 110px;
+            height: 110px;
+            margin-top: 20px;
+        }
+        
+        .emotion-drop-zone {
+            min-height: 100px;
+            border-radius: 10px;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: rgba(255,255,255,0.7);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-start;
+            justify-content: center;
+        }
+        
+        .situations {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .situation {
+            background-color: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 12px;
+            margin: 8px;
+            cursor: grab;
+            font-size: 1rem;
+            transition: all 0.2s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            width: calc(33% - 20px);
+            min-width: 200px;
+        }
+        
+        .situation:hover {
+            background-color: #e9ecef;
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .situation.dragging {
+            opacity: 0.5;
+        }
+        
+        .situation.dropped {
+            font-size: 0.9rem;
+            padding: 8px;
+            margin: 5px;
+            width: auto;
+            box-shadow: none;
+        }
+        
+        @media (max-width: 768px) {
+            .emotion {
+                width: 110px;
+                height: 110px;
+                font-size: 1.2rem;
+            }
+            
+            .emotion.main {
+                width: 110px;
+                height: 110px;
+            }
+            
+            .emotion.secondary {
+                width: 90px;
+                height: 90px;
+            }
+            
+            .situation {
+                width: calc(50% - 20px);
+                min-width: 150px;
+            }
+        }
+        
+        .reset-button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #4a6fa5;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .reset-button:hover {
+            background-color: #385d8a;
+        }
+        
+        .correct-feedback {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #d4edda;
+            color: #155724;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .instructions {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #495057;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>עץ הרגשות</h1>
+        
+        <div class="instructions">
+            גררו את הסיטואציות אל הרגש שמתאים להן
+        </div>
+        
+        <div class="emotions-tree">
+            <!-- רגשות מרכזיים -->
+            <div class="emotion-container">
+                <div class="emotion main" style="background-color: #ff6b6b;" id="anger">
+                    כעס
+                </div>
+                <div class="emotion-drop-zone" id="anger-zone"></div>
+            </div>
+            
+            <div class="emotion-container">
+                <div class="emotion main" style="background-color: #48dbfb;" id="sadness">
+                    עצב
+                </div>
+                <div class="emotion-drop-zone" id="sadness-zone"></div>
+            </div>
+            
+            <div class="emotion-container">
+                <div class="emotion main" style="background-color: #feca57;" id="joy">
+                    שמחה
+                </div>
+                <div class="emotion-drop-zone" id="joy-zone"></div>
+            </div>
+            
+            <div class="emotion-container">
+                <div class="emotion main" style="background-color: #1dd1a1;" id="excitement">
+                    התרגשות
+                </div>
+                <div class="emotion-drop-zone" id="excitement-zone"></div>
+            </div>
+            
+            <div class="emotion-container">
+                <div class="emotion main" style="background-color: #a29bfe;" id="fear">
+                    פחד
+                </div>
+                <div class="emotion-drop-zone" id="fear-zone"></div>
+            </div>
+            
+            <div class="emotion-container">
+                <div class="emotion main" style="background-color: #f368e0;" id="surprise">
+                    הפתעה
+                </div>
+                <div class="emotion-drop-zone" id="surprise-zone"></div>
+            </div>
+            
+            <!-- רגשות משניים -->
+            <div class="emotion-container">
+                <div class="emotion secondary" style="background-color: #ff9f43;" id="embarrassment">
+                    מבוכה
+                </div>
+                <div class="emotion-drop-zone" id="embarrassment-zone"></div>
+            </div>
+            
+            <div class="emotion-container">
+                <div class="emotion secondary" style="background-color: #c8d6e5;" id="loneliness">
+                    בדידות
+                </div>
+                <div class="emotion-drop-zone" id="loneliness-zone"></div>
+            </div>
+        </div>
+        
+        <div class="situations" id="situations-container">
+            <!-- סיטואציות רגשיות -->
+            <div class="situation" draggable="true" data-emotion="joy">קיבלתי מתנה שרציתי מאוד</div>
+            <div class="situation" draggable="true" data-emotion="sadness">חבר טוב שלי עבר לגור רחוק</div>
+            <div class="situation" draggable="true" data-emotion="anger">מישהו לקח את הצעצוע שלי בלי לבקש רשות</div>
+            <div class="situation" draggable="true" data-emotion="fear">שמעתי רעש מפחיד בלילה</div>
+            <div class="situation" draggable="true" data-emotion="surprise">הגעתי הביתה וערכו לי מסיבת יום הולדת</div>
+            <div class="situation" draggable="true" data-emotion="excitement">מחר אני נוסע/ת לטיול שחיכיתי לו</div>
+            <div class="situation" draggable="true" data-emotion="embarrassment">נפלתי בפני כולם בהפסקה</div>
+            <div class="situation" draggable="true" data-emotion="loneliness">אף אחד לא רצה לשחק איתי היום</div>
+            <div class="situation" draggable="true" data-emotion="joy">הצלחתי במבחן שהתכוננתי אליו</div>
+            <div class="situation" draggable="true" data-emotion="sadness">איבדתי משהו שאהבתי מאוד</div>
+            <div class="situation" draggable="true" data-emotion="anger">אח/ות שלי קלקל/ה משהו שעבדתי עליו הרבה זמן</div>
+            <div class="situation" draggable="true" data-emotion="fear">צריך להציג עבודה מול כל הכיתה</div>
+            <div class="situation" draggable="true" data-emotion="surprise">פגשתי חבר שלא ראיתי הרבה זמן</div>
+            <div class="situation" draggable="true" data-emotion="excitement">קיבלתי תפקיד חשוב במופע של בית הספר</div>
+            <div class="situation" draggable="true" data-emotion="embarrassment">אמרתי משהו שגרם לכולם לצחוק עליי</div>
+            <div class="situation" draggable="true" data-emotion="loneliness">הוזמנו כולם למסיבה חוץ ממני</div>
+        </div>
+        
+        <div class="correct-feedback" id="feedback">
+            כל הכבוד! סיימת בהצלחה את משימת עץ הרגשות!
+        </div>
+        
+        <button class="reset-button" id="reset-button">התחל מחדש</button>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let draggingElement = null;
+            let originalParent = null;
+            let droppedSituations = 0;
+            const totalSituations = document.querySelectorAll('.situation').length;
+            
+            // מאזינים לאירועי גרירה
+            document.querySelectorAll('.situation').forEach(situation => {
+                situation.addEventListener('dragstart', handleDragStart);
+                situation.addEventListener('dragend', handleDragEnd);
+            });
+            
+            // מאזינים לאזורי הנחת הרגשות
+            document.querySelectorAll('.emotion-drop-zone').forEach(zone => {
+                zone.addEventListener('dragover', handleDragOver);
+                zone.addEventListener('drop', handleDrop);
+            });
+            
+            // גרירה מתחילה
+            function handleDragStart(e) {
+                draggingElement = this;
+                originalParent = this.parentNode;
+                setTimeout(() => {
+                    this.classList.add('dragging');
+                }, 0);
+                
+                // שומר את המידע על האלמנט הנגרר
+                e.dataTransfer.setData('text/plain', this.dataset.emotion);
+                e.dataTransfer.effectAllowed = 'move';
+            }
+            
+            // גרירה מסתיימת
+            function handleDragEnd() {
+                this.classList.remove('dragging');
+            }
+            
+            // מעל אזור הנחה
+            function handleDragOver(e) {
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+            }
+            
+            // נחיתה באזור הנחה
+            function handleDrop(e) {
+                e.preventDefault();
+                
+                if (!draggingElement) return;
+                
+                const draggedEmotion = draggingElement.dataset.emotion;
+                const targetZoneId = this.id;
+                const targetEmotion = targetZoneId.replace('-zone', '');
+                
+                // בודק אם הסיטואציה כבר קיימת באזור הזה
+                const isAlreadyInThisZone = Array.from(this.children).some(child => 
+                    child.textContent === draggingElement.textContent
+                );
+                
+                if (isAlreadyInThisZone) return;
+                
+                // מעתיק את האלמנט הנגרר לאזור הנחיתה
+                const clonedElement = draggingElement.cloneNode(true);
+                clonedElement.classList.add('dropped');
+                clonedElement.draggable = false;
+                
+                this.appendChild(clonedElement);
+                
+                // אם הסיטואציה הייתה במקום אחר, מסיר אותה משם
+                if (draggingElement.classList.contains('dropped')) {
+                    draggingElement.parentNode.removeChild(draggingElement);
+                } else {
+                    droppedSituations++;
+                    checkCompletion();
+                }
+                
+                // מוסיף הדגשה אם זו תשובה נכונה
+                if (draggedEmotion === targetEmotion) {
+                    clonedElement.style.borderColor = '#28a745';
+                    clonedElement.style.backgroundColor = '#d4edda';
+                } else {
+                    clonedElement.style.borderColor = '#dc3545';
+                    clonedElement.style.backgroundColor = '#f8d7da';
+                }
+            }
+            
+            // בדיקה אם הושלמה המשימה
+            function checkCompletion() {
+                if (droppedSituations === totalSituations) {
+                    document.getElementById('feedback').style.display = 'block';
+                }
+            }
+            
+            // כפתור איפוס
+            document.getElementById('reset-button').addEventListener('click', function() {
+                document.querySelectorAll('.emotion-drop-zone').forEach(zone => {
+                    zone.innerHTML = '';
+                });
+                
+                document.getElementById('feedback').style.display = 'none';
+                
+                const situationsContainer = document.getElementById('situations-container');
+                situationsContainer.innerHTML = '';
+                
+                const situations = [
+                    {text: 'קיבלתי מתנה שרציתי מאוד', emotion: 'joy'},
+                    {text: 'חבר טוב שלי עבר לגור רחוק', emotion: 'sadness'},
+                    {text: 'מישהו לקח את הצעצוע שלי בלי לבקש רשות', emotion: 'anger'},
+                    {text: 'שמעתי רעש מפחיד בלילה', emotion: 'fear'},
+                    {text: 'הגעתי הביתה וערכו לי מסיבת יום הולדת', emotion: 'surprise'},
+                    {text: 'מחר אני נוסע/ת לטיול שחיכיתי לו', emotion: 'excitement'},
+                    {text: 'נפלתי בפני כולם בהפסקה', emotion: 'embarrassment'},
+                    {text: 'אף אחד לא רצה לשחק איתי היום', emotion: 'loneliness'},
+                    {text: 'הצלחתי במבחן שהתכוננתי אליו', emotion: 'joy'},
+                    {text: 'איבדתי משהו שאהבתי מאוד', emotion: 'sadness'},
+                    {text: 'אח/ות שלי קלקל/ה משהו שעבדתי עליו הרבה זמן', emotion: 'anger'},
+                    {text: 'צריך להציג עבודה מול כל הכיתה', emotion: 'fear'},
+                    {text: 'פגשתי חבר שלא ראיתי הרבה זמן', emotion: 'surprise'},
+                    {text: 'קיבלתי תפקיד חשוב במופע של בית הספר', emotion: 'excitement'},
+                    {text: 'אמרתי משהו שגרם לכולם לצחוק עליי', emotion: 'embarrassment'},
+                    {text: 'הוזמנו כולם למסיבה חוץ ממני', emotion: 'loneliness'}
+                ];
+                
+                // מערבב את הסיטואציות
+                const shuffledSituations = shuffleArray([...situations]);
+                
+                // יוצר מחדש את הסיטואציות
+                shuffledSituations.forEach(situation => {
+                    const div = document.createElement('div');
+                    div.classList.add('situation');
+                    div.draggable = true;
+                    div.dataset.emotion = situation.emotion;
+                    div.textContent = situation.text;
+                    div.addEventListener('dragstart', handleDragStart);
+                    div.addEventListener('dragend', handleDragEnd);
+                    situationsContainer.appendChild(div);
+                });
+                
+                droppedSituations = 0;
+            });
+            
+            // פונקציה לערבוב מערך
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+        });
+    </script>
+</body>
+</html>
